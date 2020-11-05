@@ -1,5 +1,6 @@
 FROM centos:8.2.2004
 ARG VERSION=3.8.1
+ENV VM_UTILS_VERSION=1.41.0
 
 RUN dnf clean all \
     && dnf upgrade --refresh -y\
@@ -7,9 +8,20 @@ RUN dnf clean all \
     && dnf install bzip2-devel expat-devel gdbm-devel \
     ncurses-devel openssl-devel readline-devel \
     sqlite-devel tk-devel xz-devel zlib-devel libffi-devel wget \
-    nc strace -y
+    nc strace -y \
+    && yum -y localinstall https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm --disablerepo='*' \
+    && dnf -qy module disable postgresql \
+    && dnf -y install postgresql12
 
 RUN wget https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tgz \ 
     && tar -xf Python-${VERSION}.tgz \
     && cd Python-${VERSION} && ./configure --enable-optimizations --prefix=/opt/cm_python/ && make -j $(nproc) && make altinstall \
     && rm -rf Python-${VERSION}
+
+RUN mkdir /vmutils \
+    && cd /vmutils \
+    && wget https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/v${VM_UTILS_VERSION}/vmutils-v${VM_UTILS_VERSION}.tar.gz \
+    && tar xvf vmutils-v${VM_UTILS_VERSION}.tar.gz \
+    && rm -f vmutils-v${VM_UTILS_VERSION}.tar.gz \
+    && ln -s $(pwd)/vmbackup-prod /bin/vmbackup \
+    && ln -s $(pwd)/vmrestore-prod /bin/vmrestore
