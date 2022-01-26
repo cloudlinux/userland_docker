@@ -1,4 +1,4 @@
-FROM centos:8.2.2004
+FROM almalinux:8.5
 ARG VERSION=3.8.1
 ENV VM_UTILS_VERSION=1.41.0
 
