@@ -1,5 +1,5 @@
-FROM almalinux:8.5
-ARG VERSION=3.8.1
+FROM almalinux:8.7
+ARG VERSION=3.11.4
 ENV VM_UTILS_VERSION=1.41.0
 
 RUN dnf clean all \
@@ -13,7 +13,7 @@ RUN dnf clean all \
     && dnf -qy module disable postgresql \
     && dnf -y install postgresql12
 
-RUN wget https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tgz \ 
+RUN wget https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tgz \
     && tar -xf Python-${VERSION}.tgz \
     && cd Python-${VERSION} && ./configure --enable-optimizations --prefix=/opt/cm_python/ && make -j $(nproc) && make altinstall \
     && rm -rf Python-${VERSION}
@@ -25,3 +25,4 @@ RUN mkdir /vmutils \
     && rm -f vmutils-v${VM_UTILS_VERSION}.tar.gz \
     && ln -s $(pwd)/vmbackup-prod /bin/vmbackup \
     && ln -s $(pwd)/vmrestore-prod /bin/vmrestore
+
